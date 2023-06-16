@@ -1,36 +1,33 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const TerserWebpackPlugin = require("terser-webpack-plugin");
-const { DefinePlugin } = require("webpack")
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const { DefinePlugin } = require('webpack')
 
 require('dotenv').config()
 
 const mode = process.env.NODE_ENV
-
-const isDev = mode === "development"
-
+const isDev = mode === 'development'
 
 const plugins = [
-    new DefinePlugin({
-        'process.env': JSON.stringify(process.env)
-    }),
-    new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-        template: "index.html",
-        minify: {
-            collapseWhitespace: !isDev,
-            removeComments: !isDev,
-        }
-    }),
-    new MiniCssExtractPlugin({
-        filename: isDev ? '[name].css' : '[name].[contenthash].css',
-        chunkFilename: isDev ? '[id].css' : '[id].[contenthash].css',
-    })
+	new DefinePlugin({
+		'process.env': JSON.stringify(process.env),
+	}),
+	new CleanWebpackPlugin(),
+	new HtmlWebpackPlugin({
+		template: 'index.html',
+		minify: {
+			collapseWhitespace: !isDev,
+			removeComments: !isDev,
+		},
+	}),
+	new MiniCssExtractPlugin({
+		filename: isDev ? '[name].css' : '[name].[contenthash].css',
+		chunkFilename: isDev ? '[id].css' : '[id].[contenthash].css',
+	}),
 ]
-
 
 module.exports = {
 	context: path.resolve(__dirname, 'src'),
@@ -60,7 +57,7 @@ module.exports = {
 		minimize: !isDev,
 		minimizer: [
 			new CssMinimizerPlugin(),
-			new TerserWebpackPlugin({
+			new TerserPlugin({
 				parallel: true,
 				terserOptions: {
 					format: {

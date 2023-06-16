@@ -1,19 +1,24 @@
+import ChildComponent from "../component/child.component"
+
 class RenderService {
-	//Принимает html-код, компоненты и сьиди. Помещает этот код в тег темплейт
-    htmlToElement(html, components = [], styles)
-	 {
-        const template = document.createElement('template')
-        template.innerHTML = html.trim()
-        const element = template.content.firstChild
-        
-        this.#replaceComponentTags(element, components)
-        
+
+	htmlToElement(html, components = [], styles) {
+		const template = document.createElement('template')
+		template.innerHTML = html.trim()
+
+		const element = template.content.firstChild
+
+		if (styles) {
+			this.#applyModuleStyles(styles, element)
+		}
+
+		this.#replaceComponentTags(element, components)
+
+		return element
+	}
 
 
-        return element
-    }
-	//перегоняет компоненты в обычные элементы
-    #replaceComponentTags(parentElement, components) {
+	#replaceComponentTags(parentElement, components) {
 		const componentTagPattern = /^component-/
 		const allElements = parentElement.getElementsByTagName('*')
 
@@ -46,24 +51,26 @@ class RenderService {
 		}
 	}
 
-    moduleStyles(moduleStyles, element) {
-        if(!element) return
-        const applyStyles = (element) => {
-            for(const [key,value] of Object.entries(moduleStyles)){
-                if(element.classList.contains(key)){
-                    element.classList.remove(value)
-                    element.classList.add(value)
-                }
-            }
 
-            if(element.getAttribute('class')) {
-                applyStyles(element)
-            }
+	#applyModuleStyles(moduleStyles, element) {
+		if (!element) return
 
-            const elements = element.querySelectorAll('*')
-            elements.forEach(applyStyles);
-        }
-    }
+		const applyStyles = element => {
+			for (const [key, value] of Object.entries(moduleStyles)) {
+				if (element.classList.contains(key)) {
+					element.classList.remove(key)
+					element.classList.add(value)
+				}
+			}
+		}
+
+		if (element.getAttribute('class')) {
+			applyStyles(element)
+		}
+
+		const elements = element.querySelectorAll('*')
+		elements.forEach(applyStyles)
+	}
 }
 
 

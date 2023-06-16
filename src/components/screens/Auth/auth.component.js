@@ -1,11 +1,24 @@
-import { BaseScreen } from "@/core/component/base-screen.component";
+import { BaseScreen } from "@/core/component/base-screen.component"
+import renderService from "@/core/services/render.service"
 
-export class Auth extends BaseScreen{
+import template from "./auth.template.html"
+import styles from "./auth.module.scss"
+import ChildComponent from "@/core/component/child.component"
+import { Heading } from "@/components/ui/heading/heading.component"
 
-    constructor() {
-        super({title: "Auth"})
-    }
+export class Auth extends ChildComponent {
+constructor() {
+    super({title: "Auth"})
+}
+
     render() {
-        return "<p>Auth</p>"
+        this.element = renderService.htmlToElement(template, [
+            new Heading({
+                children: "Auth"
+            })
+        ], styles)
+        return this.element
     }
+
+
 }

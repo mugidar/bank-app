@@ -1,66 +1,72 @@
-import { NotFound } from "@/components/screens/NotFound/not-found.component";
-import { ROUTES } from "./routes.data";
-import { Layout } from "@/components/layout/layout.component";
+import { Layout } from '@/components/layout/layout.component'
+import { NotFound } from '@/components/screens/NotFound/not-found.component'
+
+import { $m } from '../mquery/mquery.lib'
+
+import { ROUTES } from './routes.data'
 
 export class Router {
-    #routes = ROUTES
-    #currentRoute = null
-    #layout = null
+	#routes = ROUTES
+	#currentRoute = null
+	#layout = null
 
-    constructor() {
-        window.addEventListener("popstate", () => {
-            this.#handleRouteChange()
-        })
+	constructor() {
+		window.addEventListener('popstate', () => {
+			this.#handleRouteChange()
+		})
 
-        this.#handleRouteChange()
-        this.#handleLinks()
-    }
-    
-    #handleRouteChange() {
-       const path = this.getCurrentPath() || "/"
+		this.#handleRouteChange()
+		this.#handleLinks()
+	}
 
-       let route = this.#routes.find(route => route.path === path) || {component: NotFound} 
-   
+	#handleLinks() {
+		document.addEventListener('click', event => {
+			const target = event.target.closest('a')
 
-       this.#currentRoute = route
-       this.#render()
-   }
-    getCurrentPath() {
-        return window.location.pathname
-    }
+			if (target) {
+				event.preventDefault()
+				this.navigate(target.href)
+			}
+		})
+	}
 
-    #handleLinks () {
-        document.addEventListener( 'click', event => {
-            const target = event.target.closest('a')
+	getCurrentPath() {
+		return window.location.pathname
+	}
 
-            if(target) {
-                event.preventDefault()
-                this.navigate(target.href)
-            }
-        })
-    }
+	navigate(path) {
+		if (path !== this.getCurrentPath()) {
+			window.history.pushState({}, '', path)
+			this.#handleRouteChange()
+		}
+	}
 
-    navigate(path) {
-        if(path !== this.getCurrentPath()) {
-            window.history.pushState({}, '', path)
-            this.#handleRouteChange()
-        }
-    }
+	#handleRouteChange() {
+		const path = this.getCurrentPath() || '/'
+		let route = this.#routes.find(route => route.path === path)
 
+		if (!route) {
+			route = {
+				component: NotFound
+			}
+		}
 
+		this.#currentRoute = route
+		this.#render()
+	}
 
+	#render() {
+		const component = new this.#currentRoute.component().render()
 
-    #render() {
-        const component = new this.#currentRoute.component()
+		if (!this.#layout) {
+			this.#layout = new Layout({
+				router: this,
+				children: component
+			}).render()
 
-        if(!this.#layout){
-            this.#layout = new Layout({
-                router: this,
-                children: component.render()
-            })
-            document.getElementById("app").innerHTML = this.#layout.render()
-        }else {
-            document.querySelector('main').innerHTML = component.render()
-        }
-    }
+			$m('#app').append(this.#layout)
+		} else {
+			$m('#content').html('').append(component)
+		}
+	}
 }
